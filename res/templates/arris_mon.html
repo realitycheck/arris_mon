@@ -2,8 +2,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
-	    <title>Arris Monitor</title>
-        <script type="text/javascript" src="static/vendor/jquery.min.js"></script>
+	    <title>Arris Monitor 2.0</title>
         <script type="text/javascript" src="static/vendor/smoothie.js"></script>
         <script type="text/javascript" src="static/arris_mon.js"></script>
     </head>
@@ -34,16 +33,15 @@
 
         <p>
             <a id="start_btn" href="">[Run]</a>
-            <a id="reset_btn" href="">[Reset]</a>
-            <a id="status_btn" href="" target="_blank">[Status]</a>
+            <a id="reset_btn" href="">[Reset]</a>            
         </p>
 
         <script>
             new ArrisMonitor({
-                url: "/status.html",
+                url: "/metrics",
                 timeout: 1000,
                 downstream: {
-                    charts: ["snr", "power"],
+                    charts: ["arris_downstream_snr", "arris_downstream_power"],
                     channels: [
                         { strokeStyle:'#00ff00', lineWidth:4 },
                         { strokeStyle:'#ffff10', lineWidth:3.5 },
@@ -54,7 +52,7 @@
                         { strokeStyle:'#ffff60', lineWidth:1 },
                         { strokeStyle:'#ffff70', lineWidth:0.5 }
                     ],
-                    snr: {
+                    arris_downstream_snr: {
                         chartOptions: {
                             interpolation: "step",
                             millisPerPixel: 50,
@@ -65,7 +63,7 @@
                         chartCanvas: "#downstream_snr",
                         chartDelay: 1000,
                     },
-                    power: {
+                    arris_downstream_power: {
                         chartOptions: {
                             interpolation: "step",
                             millisPerPixel: 50,
@@ -76,28 +74,17 @@
                         },
                         chartCanvas: "#downstream_power",
                         chartDelay: 1000,
-                    },
-                    parser: {
-                        streamElement: "table:eq(1)",
-                        dataElement: "tbody tr:has(td)",
-                        parseElement: "td",
-                        parse: function($td) {
-                            return {
-                                snr: parseFloat($td.eq(4).text().slice(0, -3)),
-                                power: parseFloat($td.eq(3).text().slice(0, -5))
-                            };
-                        }
-                    }
+                    }                    
                 },
                 upstream: {
-                    charts: ["power"],
+                    charts: ["arris_upstream_power"],
                     channels: [
                         { strokeStyle:'#00ff00', lineWidth:4 },
                         { strokeStyle:'#ffff10', lineWidth:3.5 },
                         { strokeStyle:'#ffff20', lineWidth:3 },
                         { strokeStyle:'#ffff30', lineWidth:2.5 }
                     ],
-                    power: {
+                    arris_upstream_power: {
                         chartOptions: {
                             interpolation: "step",
                             millisPerPixel: 50,
@@ -108,22 +95,11 @@
                         },
                         chartCanvas: "#upstream_power",
                         chartDelay: 1000,
-                    },
-                    parser: {
-                        streamElement: "table:eq(3)",
-                        dataElement: "tbody tr:has(td)",
-                        parseElement: "td",
-                        parse: function($td) {
-                            return {
-                                power: parseFloat($td.eq(3).text().slice(0, -5))
-                            };
-                        }
-                    }
+                    }                    
                 },
                 controls: {
                     startButton: "#start_btn",
-                    resetButton: "#reset_btn",
-                    statusButton: "#status_btn",
+                    resetButton: "#reset_btn",                    
                 }
             });
         </script>
