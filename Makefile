@@ -5,29 +5,38 @@ STATIK ?= $(GOPATH)/bin/statik
 
 STATIK_DIR ?= $(shell pwd)/statik
 
-build: generate vendor
+.SHELLFLAGS = -c # Run commands in a -c flag 
+.PHONY: build install clean test generate all help
+.DEFAULT: help
+
+help: ## Help	
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'	
+
+build: generate vendor  ## Build
 	@echo ">> go build"
 	@$(GO) build
 
-test: generate vendor
+test: generate vendor ## Test
 	@echo ">> go test"	
 	@$(GO) test -cover
 
-install: build
+install: build ## Install
 	@echo ">> go install"
 	@$(GO) install
 
-clean: 
+clean: ## Clean
 	@echo ">> go clean"	
 	@$(GO) clean && rm -rf $(STATIK_DIR)
 	
-generate: $(STATIK)
+generate: $(STATIK)  ## Generate
 	@echo ">> go generate statik"
 	@$(STATIK) -f -src=./res -dest=.
 
-vendor:	$(VGO)
+vendor:	$(VGO)  ## Vendor
 	@echo ">> vgo vendor"
 	@$(VGO) vendor
+
+all: clean build test install
 
 $(VGO): 
 	@echo ">> go get vgo"
@@ -38,7 +47,3 @@ $(STATIK):
 	@echo ">> go get statik"
 	@$(GO) get -u github.com/rakyll/statik
 	@rm -rf $(GOPATH)/src/github.com/rakyll/statik
-
-all: clean build test install
-
-.PHONY: build install clean test generate all
