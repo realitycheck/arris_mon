@@ -1,0 +1,80 @@
+{
+    "url": "/metrics",
+    "timeout": 1000,
+    "graphs": {
+        "arris_downstream_power": {
+            "chartCanvas": "#downstream_power",            
+            "chartDelay": 1000,
+            "chartOptions": {
+                "interpolation": "step",
+                "millisPerPixel": 50,
+                "horizontalLines": [
+                    {"value": 15, "color": "#ff7c7c", "lineWidth": 1},
+                    {"value": -14, "color": "#ff7c7c", "lineWidth": 1}
+                ]
+            },
+            "legendOptions": {
+                "selector": "#downstream_power_legend"
+            },
+            "seriesOptions": {
+                "/name=\"Downstream 1\"/": { "strokeStyle":"#00ff00", "lineWidth":4 },
+                "/name=\"Downstream 2\"/": { "strokeStyle":"#ffff10", "lineWidth":3.5 },
+                "/name=\"Downstream 3\"/": { "strokeStyle":"#ffff20", "lineWidth":3 },
+                "/name=\"Downstream 4\"/": { "strokeStyle":"#ffff30", "lineWidth":2.5 },
+                "/name=\"Downstream 5\"/": { "strokeStyle":"#ffff40", "lineWidth":2 },
+                "/name=\"Downstream 6\"/": { "strokeStyle":"#ffff50", "lineWidth":1.5 },
+                "/name=\"Downstream 7\"/": { "strokeStyle":"#ffff60", "lineWidth":1 },
+                "/name=\"Downstream 8\"/": { "strokeStyle":"#ffff70", "lineWidth":0.5 }
+            }
+        },
+        "arris_downstream_snr": {
+            "chartCanvas": "#downstream_snr",
+            "chartDelay": 1000,
+            "chartOptions": {
+                "interpolation": "step",
+                "millisPerPixel": 50,
+                "horizontalLines": [
+                    {"value": 33, "color": "#ff7c7c", "lineWidth": 1}
+                ]
+            },
+            "legendOptions": {
+                "selector": "#downstream_snr_legend"
+            },
+            "seriesOptions": {
+                "/name=\"Downstream 1\"/": { "strokeStyle":"#00ff00", "lineWidth":4 },
+                "/name=\"Downstream 2\"/": { "strokeStyle":"#ffff10", "lineWidth":3.5 },
+                "/name=\"Downstream 3\"/": { "strokeStyle":"#ffff20", "lineWidth":3 },
+                "/name=\"Downstream 4\"/": { "strokeStyle":"#ffff30", "lineWidth":2.5 },
+                "/name=\"Downstream 5\"/": { "strokeStyle":"#ffff40", "lineWidth":2 },
+                "/name=\"Downstream 6\"/": { "strokeStyle":"#ffff50", "lineWidth":1.5 },
+                "/name=\"Downstream 7\"/": { "strokeStyle":"#ffff60", "lineWidth":1 },
+                "/name=\"Downstream 8\"/": { "strokeStyle":"#ffff70", "lineWidth":0.5 }
+            }
+        },
+        "arris_upstream_power": {
+            "chartCanvas": "#upstream_power",
+            "chartDelay": 1000,
+            "chartOptions": {
+                "interpolation": "step",
+                "millisPerPixel": 50,
+                "horizontalLines": [
+                    {"value": 39, "color": "#ff7c7c", "lineWidth": 1},
+                    {"value": 52, "color": "#ff7c7c", "lineWidth": 1}
+                ]
+            },
+            "legendOptions": {
+                "selector": "#upstream_power_legend"
+            },
+            "seriesOptions": {
+                "/name=\"Upstream 1\"/": { "strokeStyle":"#00ff00", "lineWidth":4 },
+                "/name=\"Upstream 2\"/": { "strokeStyle":"#ffff10", "lineWidth":3.5 },
+                "/name=\"Upstream 3\"/": { "strokeStyle":"#ffff20", "lineWidth":3 },
+                "/name=\"Upstream 4\"/": { "strokeStyle":"#ffff30", "lineWidth":2.5 }                
+            }
+        }
+    },
+    "controls": {
+        "startButton": "#start_btn",
+        "resetButton": "#reset_btn"
+    }
+}

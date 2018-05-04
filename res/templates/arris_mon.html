@@ -8,25 +8,28 @@
     </head>
     <body>
         <h4> Downstream </h4>
-        <table border="2" cellpadding="0" cellspacing="0" width="850">
+        <table border="2" cellpadding="0" cellspacing="0">
             <tbody>
                 <tr>
                     <td>SNR</td>
                     <td><canvas id="downstream_snr" width="800" height="200"></canvas></td>
+                    <td id="downstream_snr_legend"/>
                 </tr>
                 <tr>
                     <td>Power</td>
                     <td><canvas id="downstream_power" width="800" height="200"></canvas></td>
+                    <td id="downstream_power_legend"/>
                 </tr>
             </tbody>
         </table>
 
         <h4> Upstream </h4>
-        <table border="2" cellpadding="0" cellspacing="0" width="850">
+        <table border="2" cellpadding="0" cellspacing="0">
             <tbody>
                 <tr>
                     <td>Power</td>
                     <td><canvas id="upstream_power" width="800" height="200"></canvas></td>
+                    <td id="upstream_power_legend"/>
                 </tr>
             </tbody>
         </table>
@@ -37,71 +40,9 @@
         </p>
 
         <script>
-            new ArrisMonitor({
-                url: "/metrics",
-                timeout: 1000,
-                downstream: {
-                    charts: ["arris_downstream_snr", "arris_downstream_power"],
-                    channels: [
-                        { strokeStyle:'#00ff00', lineWidth:4 },
-                        { strokeStyle:'#ffff10', lineWidth:3.5 },
-                        { strokeStyle:'#ffff20', lineWidth:3 },
-                        { strokeStyle:'#ffff30', lineWidth:2.5 },
-                        { strokeStyle:'#ffff40', lineWidth:2 },
-                        { strokeStyle:'#ffff50', lineWidth:1.5 },
-                        { strokeStyle:'#ffff60', lineWidth:1 },
-                        { strokeStyle:'#ffff70', lineWidth:0.5 }
-                    ],
-                    arris_downstream_snr: {
-                        chartOptions: {
-                            interpolation: "step",
-                            millisPerPixel: 50,
-                            horizontalLines: [
-                                {value: 33, color: '#ff7c7c', lineWidth: 1}
-                            ]
-                        },
-                        chartCanvas: "#downstream_snr",
-                        chartDelay: 1000,
-                    },
-                    arris_downstream_power: {
-                        chartOptions: {
-                            interpolation: "step",
-                            millisPerPixel: 50,
-                            horizontalLines: [
-                                {value: 15, color: '#ff7c7c', lineWidth: 1},
-                                {value: -14, color: '#ff7c7c', lineWidth: 1}
-                            ]
-                        },
-                        chartCanvas: "#downstream_power",
-                        chartDelay: 1000,
-                    }                    
-                },
-                upstream: {
-                    charts: ["arris_upstream_power"],
-                    channels: [
-                        { strokeStyle:'#00ff00', lineWidth:4 },
-                        { strokeStyle:'#ffff10', lineWidth:3.5 },
-                        { strokeStyle:'#ffff20', lineWidth:3 },
-                        { strokeStyle:'#ffff30', lineWidth:2.5 }
-                    ],
-                    arris_upstream_power: {
-                        chartOptions: {
-                            interpolation: "step",
-                            millisPerPixel: 50,
-                            horizontalLines: [
-                                {value: 39, color: '#ff7c7c', lineWidth: 1},
-                                {value: 52, color: '#ff7c7c', lineWidth: 1}
-                            ]
-                        },
-                        chartCanvas: "#upstream_power",
-                        chartDelay: 1000,
-                    }                    
-                },
-                controls: {
-                    startButton: "#start_btn",
-                    resetButton: "#reset_btn",                    
-                }
-            });
+            (function() {
+                arris_mon.init("static/arris_mon.init.json");
+            })();
         </script>
     </body>
 </html>
