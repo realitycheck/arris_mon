@@ -55,7 +55,7 @@ function ArrisMonitor(arrisOptions) {
 
     if (arrisOptions.graphs) {
         for (var m in arrisOptions.graphs) {
-            this.graphs[m] = new ArrisGraph(arrisOptions.graphs[m]);            
+            this.graphs[m] = new ArrisGraph(m, arrisOptions.graphs[m]);            
         }
     }
 }
@@ -138,7 +138,8 @@ ArrisMonitor.prototype.parse = function (text) {
 };
 
 
-function ArrisGraph(graphOptions) {
+function ArrisGraph(name, graphOptions) {
+    this.name = name;
     this.options = graphOptions;
 
     this.chart = new SmoothieChart(this.options.chartOptions);
@@ -179,7 +180,9 @@ ArrisGraph.prototype.renderLegend = function () {
         return;
     }
 
-    var innerHTML = ["<table>"];
+    var innerHTML = [
+        "<table>" + "<caption>" + this.name + "</caption>"
+    ];
     for (var s in this.series) {
         var series = this.series[s];
         var box = [
