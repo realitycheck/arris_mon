@@ -137,7 +137,9 @@ ArrisMonitor.prototype.parse = function (text) {
     return metrics;
 };
 
-
+/**
+ * ArrisGraph class
+ */
 function ArrisGraph(name, graphOptions) {
     this.name = name;
     this.options = graphOptions;

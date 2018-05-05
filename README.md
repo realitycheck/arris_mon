@@ -14,11 +14,17 @@ Streaming ARRIS CM820B Cable Modem data into live charts.
 # Open http://127.0.0.1:8081 in your browser
 ```
 
+### Cross Compiling
+
+```
+> GOOS=windows GOARCH=amd64 make build
+```
+
 ![Arris Monitor](arris_mon.png)
 
 ## Prometheus
 
-Prometheus metrics are exported by `http://127.0.0.1:8081/metrics`
+Prometheus metrics are available at `http://127.0.0.1:8081/metrics`
 
 ## System
 
