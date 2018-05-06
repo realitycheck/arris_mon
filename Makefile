@@ -3,6 +3,7 @@ GO ?= go
 VGO ?= $(GOPATH)/bin/vgo 
 STATIK ?= $(GOPATH)/bin/statik
 WGET ?= wget
+GIT ?= git
 
 STATIK_DIR ?= $(shell pwd)/statik
 
@@ -17,11 +18,11 @@ SMOOTHIE_JS_URL ?= http://smoothiecharts.org/smoothie.js
 help: ## Help	
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'	
 
-build: vendor generate ## Build
+build: generate vendor ## Build
 	@echo ">> go build"
 	@$(GO) build
 
-test: vendor generate ## Test
+test: generate vendor ## Test
 	@echo ">> go test"	
 	@$(GO) test -cover
 
@@ -30,15 +31,15 @@ install: build ## Install
 	@$(GO) install
 
 clean: ## Clean
-	@echo ">> go clean"	
-	@$(GO) clean && rm -rf $(STATIK_DIR) $(VENDOR_JS_DIR)
+	@echo ">> go & git clean"	
+	@$(GO) clean && $(GIT) clean -qdxf
 	
-generate: $(STATIK)  ## Generate
+generate: $(STATIK) $(SMOOTHIE_JS) ## Generate
 	@echo ">> go generate statik"
 	@$(STATIK) -f -src=./res -dest=.
 
-vendor:	$(VGO) $(SMOOTHIE_JS) ## Vendor
-	@echo ">> vgo vendor" $(SMOOTHIE_JS)
+vendor:	$(VGO) ## Vendor
+	@echo ">> vgo vendor"
 	@$(VGO) vendor
 
 all: clean build test install
