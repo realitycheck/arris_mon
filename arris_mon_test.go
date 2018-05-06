@@ -4,10 +4,12 @@ import (
 	"archive/zip"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"reflect"
 	"strings"
 	"testing"
 
+	_ "github.com/realitycheck/arris_mon/statik"
 	"golang.org/x/net/html"
 )
 
@@ -161,11 +163,11 @@ func Test_parseTable(t *testing.T) {
 func Test_table_iterator(t *testing.T) {
 	tests := []struct {
 		name string
-		want channel
+		want record
 	}{
 		{
 			name: "Check Upstream 1",
-			want: channel{
+			want: record{
 				"":             "Upstream 1",
 				"UCID":         "5",
 				"Freq":         "36.00 MHz",
@@ -177,7 +179,7 @@ func Test_table_iterator(t *testing.T) {
 		},
 		{
 			name: "Check Upstream 2",
-			want: channel{
+			want: record{
 				"":             "Upstream 2",
 				"UCID":         "6",
 				"Freq":         "44.00 MHz",
@@ -215,5 +217,59 @@ func Test_table_iterator_for_loop(t *testing.T) {
 	want := len(tbl) - 1
 	if n != want {
 		t.Errorf("for cycles count = %d, want %d", n, want)
+	}
+}
+
+func Test_fallbackFS_Open(t *testing.T) {
+	type args struct {
+		name string
+	}
+	tests := []struct {
+		name    string
+		ffs     fallbackFS
+		args    args
+		wantF   bool
+		wantErr bool
+	}{
+		{
+			name:    "Check arris_mon.js in  res/static",
+			ffs:     fallbackFS{http.Dir("res/static")},
+			args:    args{name: "arris_mon.js"},
+			wantF:   true,
+			wantErr: false,
+		},
+		{
+			name:    "Check arris_mon.js in  res/templates",
+			ffs:     fallbackFS{http.Dir("res/templates")},
+			args:    args{name: "arris_mon.js"},
+			wantF:   false,
+			wantErr: true,
+		},
+		{
+			name:    "Check arris_mon.js in  res/templates and res/static",
+			ffs:     fallbackFS{http.Dir("res/templates"), http.Dir("res/static")},
+			args:    args{name: "arris_mon.js"},
+			wantF:   true,
+			wantErr: false,
+		},
+		{
+			name:    "Check arris_mon.js in empty",
+			ffs:     fallbackFS{},
+			args:    args{name: "arris_mon.js"},
+			wantF:   false,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotF, err := tt.ffs.Open(tt.args.name)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("fallbackFS.Open() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if (gotF != nil) != tt.wantF {
+				t.Errorf("fallbackFS.Open() = %v, want %v", gotF, tt.wantF)
+			}
+		})
 	}
 }

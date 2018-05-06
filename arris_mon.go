@@ -22,12 +22,13 @@ import (
 )
 
 var (
-	addr                          = "127.0.0.1:8081"
-	sourceURL                     = "http://192.168.100.1/cgi-bin/status_cgi"
-	downstreamTable               = "//table[2]/tbody"
-	upstreamTable                 = "//table[4]/tbody"
-	delay           time.Duration = 1
-	verbosity                     = false
+	addr            = "127.0.0.1:8081"
+	sourceURL       = "http://192.168.100.1/cgi-bin/status_cgi"
+	downstreamTable = "//table[2]/tbody"
+	upstreamTable   = "//table[4]/tbody"
+	delay           = 1 * time.Second
+	verbosity       = false
+	resDir          = ""
 
 	downstreamFreq           = newGauge("arris_downstream_freq", "Downstream Frequency")
 	downstreamPower          = newGauge("arris_downstream_power", "Downstream Power")
@@ -39,6 +40,23 @@ var (
 	upstreamFreq  = newGauge("arris_upstream_freq", "Upstream Frequency")
 	upstreamPower = newGauge("arris_upstream_power", "Upstream Power")
 )
+
+// fallbackFS defines a list of http.FileSystem objects
+// as a single http.FileSystem object.
+type fallbackFS []http.FileSystem
+
+func (ffs fallbackFS) Open(name string) (f http.File, err error) {
+	for _, fs := range ffs {
+		f, err = fs.Open(name)
+		if err == nil && f != nil {
+			return
+		}
+	}
+	if f == nil && err == nil {
+		err = fmt.Errorf("fallbackFS: %s not found", name)
+	}
+	return
+}
 
 func logVerbose(format string, v ...interface{}) {
 	if verbosity {
@@ -59,6 +77,10 @@ func init() {
 	flag.StringVar(&addr, "addr", addr, "Server address")
 	flag.StringVar(&sourceURL, "src", sourceURL, "Source URL")
 	flag.BoolVar(&verbosity, "v", verbosity, "Verbose print")
+	flag.StringVar(&downstreamTable, "downstream", downstreamTable, "Source downstream HTML element")
+	flag.StringVar(&upstreamTable, "upstream", upstreamTable, "Source upstream HTML element")
+	flag.DurationVar(&delay, "d", delay, "Delay of source reading")
+	flag.StringVar(&resDir, "res", resDir, "Path to local res dir for static files (optional)")
 
 	prom.MustRegister(downstreamFreq)
 	prom.MustRegister(downstreamPower)
@@ -78,7 +100,7 @@ func main() {
 	go func() {
 		for i := 1; ; i++ {
 			select {
-			case <-time.After(delay * time.Second):
+			case <-time.After(delay):
 				log.Printf("%v: #%d\n", time.Now(), i)
 				if err := pull(sourceURL, downstreamTable, upstreamTable); err != nil {
 					log.Printf("%v: %v\n", time.Now(), err)
@@ -88,10 +110,16 @@ func main() {
 	}()
 
 	// Static files
-	fs, err := statik.New()
+	staticFS, err := statik.New()
 	if err != nil {
 		log.Panicf("arris_mon: %s", err)
 	}
+
+	fs := fallbackFS{}
+	if resDir != "" {
+		fs = append(fs, http.Dir(resDir))
+	}
+	fs = append(fs, staticFS)
 
 	// App template
 	file, err := fs.Open("/templates/arris_mon.html")
@@ -175,7 +203,7 @@ func pull(url, downstreamTable, upstreamTable string) error {
 }
 
 type table [][]string
-type channel map[string]string
+type record map[string]string
 
 func parseTable(doc *html.Node, expr string) table {
 	tr := htmlquery.Find(htmlquery.FindOne(doc, expr), "/tr[td]")
@@ -190,9 +218,9 @@ func parseTable(doc *html.Node, expr string) table {
 	return t
 }
 
-func (t table) iterator() func() channel {
+func (t table) iterator() func() record {
 	i, n := 0, len(t)
-	return func() channel {
+	return func() record {
 		if i++; i >= n {
 			return nil
 		}
@@ -202,7 +230,7 @@ func (t table) iterator() func() channel {
 			log.Panic("arris_mon: lengthes of keys and values are mismatched")
 		}
 
-		res := make(channel, len(keys))
+		res := make(record, len(keys))
 		for j, val := range vals {
 			res[keys[j]] = val
 		}
